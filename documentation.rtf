@@ -1,0 +1,40 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid102\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid201\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid202\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid3}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}}
+\margl1440\margr1440\vieww19240\viewh11400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 The purpose of Region_or_taxGroup_Plots_Code-KM.r is to produce the following plots, pdfs and tables used in the RAM Legacy Stock Assessmement Database website:\
+-----------\
+\pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
+\ls1\ilvl0\cf0 {\listtext	\'95	} Biomass Coverage plots -- horizontal bar chart that plots the year range of data covered inthe most recent assessment for each stock, beginning in year_min (1950 as of this revision). Each bar represents an individual stock, sorted vertically from largest to smallest by average biomass over the time series. There are 2 versions of this plot; one that scales with biomass and has all stocks in 1 plot, and the other that doesn't scale with biomass so all stocks are equally visible (stocks are individually labeled in this version)\
+\pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
+\ls2\ilvl0\cf0 {\listtext	\'95	}Surplus Production plots -- vertical bar chart that plots annual surplus production (net increase of biomass plus catch) over time beginning in year_min for the four stocks with the highest average biomass in the region or taxGroup. The plot also includes a subtitle that has the percentage of absolute surplus production that the stock represents in the region or taxGroup.\
+{\listtext	\'95	}Surplus Production vs. Biomass plots -- line and point plot that shows path of annual surplus production compared to annual biomass over time (beginning in year_min) for the four stocks that contribute the most to absolute surplus production in the region or taxGroup. Years are represented by a continuous color scale, with the first and last years labeled on the plot. 0 is emphasized with a thick black line.\
+{\listtext	\'95	}Summary PDF -- A pdf of the above plots, each on their own page, for each region or taxGroup. \
+{\listtext	\'95	}Summary Table csv file -- csv file of a 2 column dataframe with the information for the tables at the top of each region and taxGroup page. Info includes: \
+\pard\tx940\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li1440\fi-1440\pardirnatural\partightenfactor0
+\ls2\ilvl1\cf0 {\listtext	\uc0\u8259 	}number of stocks, \
+{\listtext	\uc0\u8259 	}number of taxGroups for region-separated data or number of regions for taxGroup-separated data, \
+{\listtext	\uc0\u8259 	}first year and last year found in that region or taxGroup data set, and \
+{\listtext	\uc0\u8259 	}labels for all of the above.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+\
+RAM_Plot_Set_up.R is designed to be run as part of Region_or_taxGroup_Plots_Code-KM.R and it produces the transformed and filtered datasets based on RAM data used to make the region and taxGroup plots described in Region_or_taxGroup_Plots_Code-KM.R\
+\
+Notes on naming convention:\
+\pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
+\ls3\ilvl0\cf0 {\listtext	\'95	} all variables and dataframes used in the region plots begin with "region\'94\
+\pard\tx940\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li1440\fi-1440\pardirnatural\partightenfactor0
+\ls3\ilvl1\cf0 {\listtext	\uc0\u8259 	}For example, "region_legend_order" is the order that the taxonomy groups are put in for the color legend in the region plots\
+\pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
+\ls3\ilvl0\cf0 {\listtext	\'95	} the taxGroup categories are different in the timeseries_values_views dataframe compared to the All_TBbest.df dataframe; for all plots that use All_TBbest.df as the data source, use variables and dataframes starting with "TB_taxGroup"; the ones starting with "taxGroup" can be used for plots and tables using data from the timeseries_values_views dataframe.\
+}
