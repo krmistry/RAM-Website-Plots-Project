@@ -79,17 +79,17 @@ basic_biomass_by_stock_ggplot <- function(dataframe,
 # including first_stock
 
 biomass_plot_fun <- function(dataframe, 
-                                  end_stock, 
-                                  plot_title,
-                                  type_of_plot = c("Region", 
-                                                   "Taxonomy Group"),
-                                  custom_colors,
-                                  color_legend_title = c("Taxonomy Group",
+                             end_stock, 
+                             plot_title,
+                             type_of_plot = c("Region", 
+                                              "Taxonomy Group"),
+                             custom_colors,
+                             color_legend_title = c("Taxonomy Group",
                                                     "Region"),
-                                  color_segment = c("taxGroup",
-                                                    "region"),
-                                  print = TRUE,
-                                  save = FALSE) {
+                             color_segment = c("taxGroup",
+                                               "region"),
+                             print = TRUE,
+                             save = FALSE) {
   if (end_stock <= 30) {
     plot_x1 <- basic_biomass_by_stock_ggplot(dataframe, 
                                              first_stock = 1, 

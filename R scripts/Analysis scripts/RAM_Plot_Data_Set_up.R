@@ -9,7 +9,6 @@
 library(plyr)
 library(dplyr)
 library(stringr)
-library(here)
 
 
 # ***** Notes on naming convention:
@@ -31,13 +30,13 @@ library(here)
 ##################################################################################
 
 # File with majority of data for all stocks:
-timeseries_values_views <- read.csv(here("RAM Files (v4.44)/views tables/timeseries_values_views.csv"))
+timeseries_values_views <- read.csv(here::here("Data/RAM Files (v4.44)/views tables/timeseries_values_views.csv"))
 
 # File that contains stockid mapped to region and scientificname:
-stock_info <- read.csv(here("RAM Files (v4.44)/ram tables/stock.csv"))
+stock_info <- read.csv(here::here("Data/RAM Files (v4.44)/ram tables/stock.csv"))
 
 # File that contains taxGroup (and FisheryType) mapped to scientificname:
-taxonomy <- read.csv(here("RAM Files (v4.44)/ram tables/taxonomy.csv"))
+taxonomy <- read.csv(here::here("Data/RAM Files (v4.44)/ram tables/taxonomy.csv"))
 
 # Adding region, scientificname, FisheryType and taxGroup variables to 
 # timeseries_values_views dataframe:
@@ -56,6 +55,9 @@ timeseries_values_views$region <- timeseries_values_views$region %>%
   sub("Russia Japan", "Northwest Pacific", .) %>%
   sub("Europe non EU", "Norway, Iceland, Faroe Islands", .) %>%
   sub("European Union", "European Union (non Mediterranean)", .)
+
+# Capitalize taxGroup values (makes things easier in terms of matching the legend)
+timeseries_values_views$taxGroup <- str_to_title(timeseries_values_views$taxGroup)
 
 # Extracting the stocks that have data in the TBbest column into a new 
 # dataframe:
@@ -84,12 +86,12 @@ region_labels <- gsub(" ", "_", regions)
 # Taxonomy group lists for timeseries_values_views data:
 taxGroup_list <- unique(timeseries_values_views$taxGroup)
 number_taxGroups <- length(taxGroup_list)
-taxGroup_plot_titles <- str_to_title(taxGroup_list)
+taxGroup_plot_titles <- taxGroup_list
 taxGroup_labels <- gsub(" |-", "_", taxGroup_list)
 # Taxonomy group lists for All_TBbest.df data:
 TB_taxGroup_list <- as.character(taxGroup_list[taxGroup_list %in% unique(All_TBbest.df$taxGroup)])
 number_TB_taxGroups <- length(TB_taxGroup_list)
-TB_taxGroup_plot_titles <- str_to_title(TB_taxGroup_list)
+TB_taxGroup_plot_titles <- TB_taxGroup_list
 TB_taxGroup_labels <- gsub(" |-", "_", TB_taxGroup_list)
 ##### use TB_taxGroup_list for matching with All_TBbest.df$taxGroup ###########
 
@@ -145,12 +147,13 @@ TB_stock_region_per_taxgroup <- summary_fun("taxGroup",
 ############ Color palettes for regions & taxGroups (for plots) ################
 ################################################################################
 
-# Setting the taxGroup levels to be a specific color in all region plots:
-
-region_legend_order <- c("Gadids", "Pleuronectids", "Sebastids", "Other Scorpaenids", "Forage Fish"
-                  , "Carangids-Mackerels", "Tuna-Billfish", "Elasmobranchs", "Other Marine Percoidids",
-                  "Other Marine Fish", "Salmonids", "Eels", "Crabs-Lobsters", "Shrimps", 
-                  "Bivalves-Gastropods", "Cephalopods", "Echinoderms")
+# Setting the taxGroup levels to be a specific color (and in a specific order) 
+# in all region plots:
+region_legend_order <- c("Gadids", "Pleuronectids", "Sebastids", "Other Scorpaenids",
+                         "Forage Fish", "Carangids-Mackerels", "Tuna-Billfish",
+                         "Elasmobranchs", "Other Marine Percoidids", "Other Marine Fish",
+                         "Salmonids", "Eels", "Crabs-Lobsters", "Shrimps", 
+                         "Bivalves-Gastropods", "Cephalopods", "Echinoderms")
 
 region_myColors <- c("yellowgreen", "palegreen", "tomato", "pink", "darkorange", "steelblue2", "violet", "mediumpurple", 
               "burlywood", "slategray1", "firebrick3", "khaki", "gold", "gray91", 
@@ -216,7 +219,7 @@ TB_taxGroup_custom_y_axis <- custom_y_axis_fun(number_TB_taxGroups,
 ###############################################################################
 #
 # For RAM v4.44 data:
-surplus <- read.csv(here("RAM Files (v4.44)/surplus production/sp.data.csv")) # the surplus production with model fit data
+surplus <- read.csv(here::here("Data/RAM Files (v4.44)/surplus production/sp.data.csv")) # the surplus production with model fit data
 
 # Importing stocklong, region, scientificname, taxGroup from other dataframes
 surplus$stocklong <- 
@@ -227,6 +230,7 @@ surplus$region <-
   stock_info$region[match(surplus$stockid, stock_info$stockid)]
 surplus$taxGroup <-
   taxonomy$taxGroup[match(surplus$scientificname, taxonomy$scientificname)]
+surplus$taxGroup <- str_to_title(surplus$taxGroup)
 surplus$taxGroup <- factor(surplus$taxGroup, levels = TB_taxGroup_list)
 
 # Change some region values (to match other datasets):
@@ -236,7 +240,7 @@ surplus$region <- surplus$region %>%
   sub("European Union", "European Union (non Mediterranean)", .)
 
 # Bringing MSY into surplus data from the bioparams_values_view file using stockid:
-bioparams_values_views <- read.csv(here("RAM Files (v4.44)/views tables/bioparams_values_views.csv"))
+bioparams_values_views <- read.csv(here::here("Data/RAM Files (v4.44)/views tables/bioparams_values_views.csv"))
 
 surplus$MSYbest <- 
   bioparams_values_views$MSYbest[match(surplus$stockid, 
