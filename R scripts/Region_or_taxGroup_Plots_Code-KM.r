@@ -2,6 +2,11 @@
 ## Created by Kelly Mistry, kelly.r.mistry@gmail.com
 ## Last revised: 4/3/2019
 
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(ggrepel)
+library(scales)
 library(here)
 
 # Start the clock
@@ -46,22 +51,21 @@ ptm <- proc.time()
 ########## All Directories (source and to save plots to) #####################
 #------- CHANGE AS NEEDED to match local directories before running code------
 
-# Directory with the 3 sourced files needed (RAM_Plot_Data_Set_up_Function.R, 
-# RAM_Plot_Data_Set_up.R, and RAM_Plot_Creation_Functions.R), and with the 
-# RAM Files v4.44 folder in it (all of these need to be in the same folder)
-source_directory <- here()
+# Directory with the RAM Files v4.44 folder in it 
+# source_directory <- here()
+# data_directory <- here("Data/RAM Files (v4.44)/")
 
 # String that combined with source_directory points towards correct directories 
 # to save region and taxGroup plots to:
-by_region <- "Test Assessment Plots/Plots by Region/"
-by_taxGroup <- "Test Assessment Plots/Plots by taxGroup/"
+by_region <- here::here("Results", "Region/")
+by_taxGroup <- here::here("Results", "taxGroup/")
 
 # String with folder name for each type of plot, to combine with source directory 
 # and either by_region or by_taxGroup:
-biomass_coverage_by_stock_folder <- "Biomass Coverage by Stock/"
-biomass_coverage_all_stocks_folder <- "Biomass Coverage All Stocks/"
-surplus_top_4_folder <- "Surplus Production - Top 4 Stocks/"
-surplus_v_biomass_top_4_folder <- "Surplus v Biomass - Top 4 Stocks/"
+biomass_coverage_by_stock_folder <- "Plots/Biomass Coverage by Stock/"
+biomass_coverage_all_stocks_folder <- "Plots/Biomass Coverage All Stocks/"
+surplus_top_4_folder <- "Plots/Surplus Production - Top 4 Stocks/"
+surplus_v_biomass_top_4_folder <- "Plots/Surplus v Biomass - Top 4 Stocks/"
 summary_pdf_of_plots_folder <- "Summary PDF of Plots/"
 summary_table_folder <- "Summary Tables/"
 
@@ -73,74 +77,62 @@ summary_table_folder <- "Summary Tables/"
 #-------------------------------------------------------------------------
 
 # Directory to save region biomass coverage by stock plots to:
-region_biomass_coverage_by_stock_directory <- paste(source_directory,
-                                                    by_region,
+region_biomass_coverage_by_stock_directory <- paste(by_region,
                                                     biomass_coverage_by_stock_folder,
                                                     sep = "")
 
 # Directory to save region biomass coverage for ALL stocks plots to:
-region_biomass_coverage_all_stocks_directory <- paste(source_directory,
-                                                      by_region,
+region_biomass_coverage_all_stocks_directory <- paste(by_region,
                                                       biomass_coverage_all_stocks_folder,
                                                       sep = "")
 
 # Directory to save taxGroup biomass coverage by stock plots to:
-taxGroup_biomass_coverage_by_stock_directory <- paste(source_directory,
-                                                      by_taxGroup,
+taxGroup_biomass_coverage_by_stock_directory <- paste(by_taxGroup,
                                                       biomass_coverage_by_stock_folder,
                                                       sep = "")
   
 # Directory to save taxGroup biomass coverage for ALL stocks plots to:
-taxGroup_biomass_coverage_all_stocks_directory <- paste(source_directory,
-                                                        by_taxGroup,
+taxGroup_biomass_coverage_all_stocks_directory <- paste(by_taxGroup,
                                                         biomass_coverage_all_stocks_folder,
                                                         sep = "")
 
 # Directory to save region surplus production for top 4 stocks plots to:
-region_surplus_top_4_directory <- paste(source_directory,
-                                        by_region,
+region_surplus_top_4_directory <- paste(by_region,
                                         surplus_top_4_folder,
                                         sep = "")
 
 # Directory to save taxGroup surplus production for top 4 stocks plots to:
-taxGroup_surplus_top_4_directory <- paste(source_directory,
-                                          by_taxGroup,
+taxGroup_surplus_top_4_directory <- paste(by_taxGroup,
                                           surplus_top_4_folder,
                                           sep = "")
 
 # Directory to save region surplus production vs. biomass for top 4 stocks plots to:
-region_surplus_v_biomass_top_4_directory <- paste(source_directory,
-                                                  by_region,
+region_surplus_v_biomass_top_4_directory <- paste(by_region,
                                                   surplus_v_biomass_top_4_folder,
                                                   sep = "")
 
 # Directory to save taxGroup surplus production vs. biomass for top 4 stocks plots to:
-taxGroup_surplus_v_biomass_top_4_directory <- paste(source_directory,
-                                                    by_taxGroup,
+taxGroup_surplus_v_biomass_top_4_directory <- paste(by_taxGroup,
                                                     surplus_v_biomass_top_4_folder,
                                                     sep = "")
 
 # Directory to save summary pdfs with all region plots to:
-region_summary_PDF_directory <- paste(source_directory,
-                                      by_region,
+region_summary_PDF_directory <- paste(by_region,
                                       summary_pdf_of_plots_folder,
                                       sep = "")
 
 # Directory to save summary pdfs with all taxGroup plots to:
-taxGroup_summary_PDF_directory <- paste(source_directory,
-                                        by_taxGroup,
+taxGroup_summary_PDF_directory <- paste(by_taxGroup,
                                         summary_pdf_of_plots_folder,
                                         sep = "")
 
 # Directory to save summary table CSVs used at top of page for each region:
-region_summary_table_directory <- paste(source_directory,
-                                        by_region,
+region_summary_table_directory <- paste(by_region,
                                         summary_table_folder,
                                         sep = "")
 
 # Directory to save summary table CSVs used at top of page for each taxGroup:
-taxGroup_summary_table_directory <- paste(source_directory,
-                                        by_taxGroup,
+taxGroup_summary_table_directory <- paste(by_taxGroup,
                                         summary_table_folder,
                                         sep = "")
 
@@ -148,24 +140,17 @@ taxGroup_summary_table_directory <- paste(source_directory,
 ########## Initial Set Up ####################################################
 #
 
-library(plyr)
-library(dplyr)
-library(ggplot2)
-library(ggrepel)
-library(scales)
-
-
 # ****** Make sure the RAM v4.44 folder is in the source directory! ********
-setwd(source_directory)
+#setwd(source_directory)
 
 # Load custom functions for data set up:
-source("RAM_Plot_Data_Set_Up_Functions.R")
+source(here::here("R scripts/Functions/RAM_Plot_Data_Set_Up_Functions.R"))
 
 # Minimum year used for all data set up in the RAM_Plot_Data_Set_up.R file:
 year_min <- 1950
 
 # Load data sets needed for plots
-source("RAM_Plot_Data_Set_up.R")
+source(here::here("R scripts/Analysis scripts/RAM_Plot_Data_Set_up.R"))
 
 # Datasets loaded from RAM: 
 # - timeseries_values_views.csv
@@ -225,8 +210,8 @@ source("RAM_Plot_Data_Set_up.R")
 #
 # - TB_taxGroup_sum_bio_SP_per_year
 
-# Load custom functions for plots:
-source("RAM_Plot_Creation_Functions.R")
+# Load custom functions for creating plots:
+source(here::here("R scripts/Functions/RAM_Plot_Creation_Functions.R"))
 
 # Functions loaded:
 #------------------------------------------------------------------------------
@@ -303,13 +288,13 @@ setwd(region_biomass_coverage_by_stock_directory)
 
 # Loop to produce and save all of the regions' biomass coverage by stocks plots:
 for (i in 1:number_regions) {
-  biomass_plot_fun(region_mean_biomass[[i]], 
+  biomass_plot_fun(dataframe = region_mean_biomass[[i]], 
                    end_stock = TB_stock_tax_per_region$Num_Stocks[i], 
-                   regions_plot_titles[i],
-                   "Region",
-                   region_myColors,
-                   "Taxonomy Group",
-                   "taxGroup",
+                   plot_title = regions_plot_titles[i],
+                   type_of_plot = "Region",
+                   custom_colors = region_myColors,
+                   color_legend_title = "Taxonomy Group",
+                   color_segment = "taxGroup",
                    print = FALSE,
                    save = TRUE)
 }
@@ -320,13 +305,13 @@ setwd(region_biomass_coverage_all_stocks_directory)
 # Loop to produce and save all of the taxonomy group's biomass coverage for all 
 # stocks plots:
 for (i in 1:number_regions) {
-  biomass_all_stock_ggplot(region_mean_biomass[[i]], 
-                           region_custom_y_axis[[i]], 
-                           regions_plot_titles[i],
-                           region_myColors,
-                           "Region",
-                           "Taxonomy Group",
-                           "taxGroup",
+  biomass_all_stock_ggplot(dataframe = region_mean_biomass[[i]], 
+                           y_axis = region_custom_y_axis[[i]], 
+                           plot_title = regions_plot_titles[i],
+                           custom_colors = region_myColors,
+                           type_of_plot = "Region",
+                           color_legend_title = "Taxonomy Group",
+                           color_segment = "taxGroup",
                            print = FALSE,
                            save = TRUE)
 }
@@ -360,10 +345,10 @@ setwd(taxGroup_biomass_coverage_all_stocks_directory)
 # Loop to produce and save all of the taxonomy group's biomass coverage for all 
 # stocks plots:
 for (i in 1:number_TB_taxGroups) {
-  biomass_all_stock_ggplot(TB_taxGroup_mean_biomass[[i]], 
-                           TB_taxGroup_custom_y_axis[[i]], 
-                           TB_taxGroup_plot_titles[i],
-                           taxGroup_myColors,
+  biomass_all_stock_ggplot(dataframe = TB_taxGroup_mean_biomass[[i]], 
+                           y_axis = TB_taxGroup_custom_y_axis[[i]], 
+                           plot_title = TB_taxGroup_plot_titles[i],
+                           custom_colors = taxGroup_myColors,
                            type_of_plot = "Taxonomy Group",
                            color_legend_title = "Region",
                            color_segment = "region",
@@ -389,31 +374,31 @@ setwd(region_surplus_top_4_directory)
 for (i in 1:number_regions) {
   if (nrow(region_surplus_mean_biomass[[i]]) > 4) {
     for (j in 1:4) {
-      surplus_top_stocks_plot(surplus, 
-                              "Region",
-                              regions[i], 
-                              region_surplus_mean_biomass[[i]],
-                              region_surplus_mean_biomass[[i]][j, 1], 
-                              region_surplus_mean_biomass[[i]][j, 4], 
-                              regions_plot_titles[i],
-                              region_myColors,
-                              "Taxonomy Group",
-                              "taxGroup",
+      surplus_top_stocks_plot(dataframe = surplus, 
+                              type_of_plot = "Region",
+                              region_or_taxGroup = regions[i], 
+                              SP_mean_biomass_data = region_surplus_mean_biomass[[i]],
+                              stock = region_surplus_mean_biomass[[i]][j, 1], 
+                              percent_surplus = region_surplus_mean_biomass[[i]][j, 4], 
+                              plot_title = regions_plot_titles[i],
+                              custom_colors = region_myColors,
+                              color_legend_title = "Taxonomy Group",
+                              color_segment = "taxGroup",
                               print = FALSE,
                               save = TRUE)
     }
   } else {
     for (k in 1:nrow(region_surplus_mean_biomass[[i]])) {
-      surplus_top_stocks_plot(surplus, 
-                              "Region",
-                              regions[i], 
-                              region_surplus_mean_biomass[[i]],
-                              region_surplus_mean_biomass[[i]][k, 1], 
-                              region_surplus_mean_biomass[[i]][k, 4], 
-                              regions_plot_titles[i],
-                              region_myColors,
-                              "Taxonomy Group",
-                              "taxGroup",
+      surplus_top_stocks_plot(dataframe = surplus, 
+                              type_of_plot = "Region",
+                              region_or_taxGroup = regions[i], 
+                              SP_mean_biomass_data = region_surplus_mean_biomass[[i]],
+                              stock = region_surplus_mean_biomass[[i]][k, 1], 
+                              percent_surplus = region_surplus_mean_biomass[[i]][k, 4], 
+                              plot_title = regions_plot_titles[i],
+                              custom_colors = region_myColors,
+                              color_legend_title = "Taxonomy Group",
+                              color_segment = "taxGroup",
                               print = FALSE,
                               save = TRUE)
     }
@@ -430,31 +415,31 @@ setwd(taxGroup_surplus_top_4_directory)
 for (i in 1:number_TB_taxGroups) {
   if (nrow(TB_taxGroup_surplus_mean_biomass[[i]]) > 4) {
     for (j in 1:4) {
-      surplus_top_stocks_plot(surplus, 
-                              "Taxonomy Group",
-                              TB_taxGroup_list[i], 
-                              TB_taxGroup_surplus_mean_biomass[[i]],
-                              TB_taxGroup_surplus_mean_biomass[[i]][j, 1], 
-                              TB_taxGroup_surplus_mean_biomass[[i]][j, 4], 
-                              TB_taxGroup_plot_titles[i],
-                              taxGroup_myColors,
-                              "Region",
-                              "region",
+      surplus_top_stocks_plot(dataframe = surplus, 
+                              type_of_plot = "Taxonomy Group",
+                              region_or_taxGroup = TB_taxGroup_list[i], 
+                              SP_mean_biomass_data = TB_taxGroup_surplus_mean_biomass[[i]],
+                              stock = TB_taxGroup_surplus_mean_biomass[[i]][j, 1], 
+                              percent_surplus = TB_taxGroup_surplus_mean_biomass[[i]][j, 4], 
+                              plot_title = TB_taxGroup_plot_titles[i],
+                              custom_colors = taxGroup_myColors,
+                              color_legend_title = "Region",
+                              color_segment = "region",
                               print = FALSE,
                               save = TRUE)
     }
   } else {
     for (k in 1:nrow(TB_taxGroup_surplus_mean_biomass[[i]])) {
-      surplus_top_stocks_plot(surplus, 
-                              "Taxonomy Group",
-                              TB_taxGroup_list[i], 
-                              TB_taxGroup_surplus_mean_biomass[[i]],
-                              TB_taxGroup_surplus_mean_biomass[[i]][k, 1], 
-                              TB_taxGroup_surplus_mean_biomass[[i]][k, 4], 
-                              TB_taxGroup_plot_titles[i],
-                              taxGroup_myColors,
-                              "Region",
-                              "region",
+      surplus_top_stocks_plot(dataframe = surplus, 
+                              type_of_plot = "Taxonomy Group",
+                              region_or_taxGroup = TB_taxGroup_list[i], 
+                              SP_mean_biomass_data = TB_taxGroup_surplus_mean_biomass[[i]],
+                              stock = TB_taxGroup_surplus_mean_biomass[[i]][k, 1], 
+                              percent_surplus = TB_taxGroup_surplus_mean_biomass[[i]][k, 4], 
+                              plot_title = TB_taxGroup_plot_titles[i],
+                              custom_colors = taxGroup_myColors,
+                              color_legend_title = "Region",
+                              color_segment = "region",
                               print = FALSE,
                               save = TRUE)
     }
@@ -480,24 +465,23 @@ setwd(region_surplus_v_biomass_top_4_directory)
 for (j in 1:number_regions) {
   if (nrow(region_surplus_mean_biomass[[j]]) > 4) {
     for (i in 1:4) {
-      top_stocks_SP_vs_bio_plot(surplus,
-                                region_surplus_mean_biomass[[j]][i, 1],
-                                regions[j],
-                                region_surplus_mean_biomass[[j]],
-                                "Region",
-                                regions_plot_titles[j],
+      top_stocks_SP_vs_bio_plot(surplus_data = surplus,
+                                stock = region_surplus_mean_biomass[[j]][i, 1],
+                                regions_or_taxGroup = regions[j],
+                                SP_mean_biomass_data = region_surplus_mean_biomass[[j]],
+                                type_of_plot = "Region",
+                                plot_titles = regions_plot_titles[j],
                                 print = FALSE,
                                 save = TRUE)
-      
     }
   }  else {
     for (k in 1:nrow(region_surplus_mean_biomass[[i]])) {
-      top_stocks_SP_vs_bio_plot(surplus,
-                                region_surplus_mean_biomass[[j]][k, 1],
-                                regions[j],
-                                region_surplus_mean_biomass[[j]],
-                                "Region",
-                                regions_plot_titles[j],
+      top_stocks_SP_vs_bio_plot(surplus_data = surplus,
+                                stock = region_surplus_mean_biomass[[j]][k, 1],
+                                regions_or_taxGroup = regions[j],
+                                SP_mean_biomass_data = region_surplus_mean_biomass[[j]],
+                                type_of_plot = "Region",
+                                plot_titles = regions_plot_titles[j],
                                 print = FALSE,
                                 save = TRUE)
     }
@@ -513,24 +497,23 @@ setwd(taxGroup_surplus_v_biomass_top_4_directory)
 for (j in 1:number_TB_taxGroups) {
   if (nrow(TB_taxGroup_surplus_mean_biomass[[j]]) > 4) {
     for (i in 1:4) {
-      top_stocks_SP_vs_bio_plot(surplus,
-                                TB_taxGroup_surplus_mean_biomass[[j]][i, 1],
-                                TB_taxGroup_list[j],
-                                TB_taxGroup_surplus_mean_biomass[[j]],
-                                "Taxonomy Group",
-                                TB_taxGroup_plot_titles[j],
+      top_stocks_SP_vs_bio_plot(surplus_data = surplus,
+                                stock = TB_taxGroup_surplus_mean_biomass[[j]][i, 1],
+                                regions_or_taxGroup = TB_taxGroup_list[j],
+                                SP_mean_biomass_data = TB_taxGroup_surplus_mean_biomass[[j]],
+                                type_of_plot = "Taxonomy Group",
+                                plot_titles = TB_taxGroup_plot_titles[j],
                                 print = FALSE,
                                 save = TRUE)
-      
     }
   }  else {
     for (k in 1:nrow(TB_taxGroup_surplus_mean_biomass[[i]])) {
-      top_stocks_SP_vs_bio_plot(surplus,
-                                TB_taxGroup_surplus_mean_biomass[[j]][i, 1],
-                                TB_taxGroup_list[j],
-                                TB_taxGroup_surplus_mean_biomass[[j]],
-                                "Taxonomy Group",
-                                TB_taxGroup_plot_titles[j],
+      top_stocks_SP_vs_bio_plot(surplus_data = surplus,
+                                stock = TB_taxGroup_surplus_mean_biomass[[j]][i, 1],
+                                regions_or_taxGroup = TB_taxGroup_list[j],
+                                SP_mean_biomass_data = TB_taxGroup_surplus_mean_biomass[[j]],
+                                type_of_plot = "Taxonomy Group",
+                                plot_titles = TB_taxGroup_plot_titles[j],
                                 print = FALSE,
                                 save = TRUE)
     }
@@ -554,54 +537,56 @@ setwd(region_summary_PDF_directory)
 for (i in 1:number_regions) {
   pdf(file = paste(regions[i], "Summary Plots.pdf"), width = 14, height = 8)
   
-  plot_1 <- biomass_all_stock_ggplot(region_mean_biomass[[i]],
-                           region_custom_y_axis[[i]],
-                           regions_plot_titles[i],
-                           region_myColors,
-                           "Region",
-                           "taxGroup",
-                           print = FALSE,
-                           save = FALSE)
+  plot_1 <- biomass_all_stock_ggplot(dataframe = region_mean_biomass[[i]],
+                                     y_axis = region_custom_y_axis[[i]],
+                                     plot_title = regions_plot_titles[i],
+                                     custom_colors = region_myColors,
+                                     type_of_plot = "Region",
+                                     color_legend_title = "Taxonomy Group",
+                                     color_segment = "taxGroup",
+                                     print = FALSE,
+                                     save = FALSE)
   print(plot_1)
   
-  plot_2 <- biomass_plot_fun(region_mean_biomass[[i]],
-                   end_stock = TB_stock_tax_per_region$Num_Stocks[i],
-                   regions_plot_titles[i],
-                   "Region",
-                   region_myColors,
-                   "taxGroup",
-                   print = FALSE,
-                   save = FALSE)
+  plot_2 <- biomass_plot_fun(dataframe = region_mean_biomass[[i]],
+                             end_stock = TB_stock_tax_per_region$Num_Stocks[i],
+                             plot_title = regions_plot_titles[i],
+                             type_of_plot = "Region",
+                             custom_colors = region_myColors,
+                             color_legend_title = "Taxonomy Group",
+                             color_segment = "taxGroup",
+                             print = FALSE,
+                             save = FALSE)
   print(plot_2)
   
   if (nrow(region_surplus_mean_biomass[[i]]) > 4) {
     for (j in 1:4) {
-      plots_3 <- surplus_top_stocks_plot(surplus, 
-                                         "Region",
-                                         regions[i], 
-                                         region_surplus_mean_biomass[[i]],
-                                         region_surplus_mean_biomass[[i]][j, 1], 
-                                         region_surplus_mean_biomass[[i]][j, 4], 
-                                         regions_plot_titles[i],
-                                         region_myColors,
-                                         "Taxonomy Group",
-                                         "taxGroup",
+      plots_3 <- surplus_top_stocks_plot(dataframe = surplus, 
+                                         type_of_plot = "Region",
+                                         region_or_taxGroup = regions[i], 
+                                         SP_mean_biomass_data = region_surplus_mean_biomass[[i]],
+                                         stock = region_surplus_mean_biomass[[i]][j, 1], 
+                                         percent_surplus = region_surplus_mean_biomass[[i]][j, 4], 
+                                         plot_title = regions_plot_titles[i],
+                                         custom_colors = region_myColors,
+                                         color_legend_title = "Taxonomy Group",
+                                         color_segment = "taxGroup",
                                          print = FALSE,
                                          save = FALSE)
       print(plots_3)
     }
   } else {
     for (k in 1:nrow(region_surplus_mean_biomass[[i]])) {
-      plots_3 <- surplus_top_stocks_plot(surplus, 
-                                         "Region",
-                                         regions[i], 
-                                         region_surplus_mean_biomass[[i]],
-                                         region_surplus_mean_biomass[[i]][k, 1], 
-                                         region_surplus_mean_biomass[[i]][k, 4], 
-                                         regions_plot_titles[i],
-                                         region_myColors,
-                                         "Taxonomy Group",
-                                         "taxGroup",
+      plots_3 <- surplus_top_stocks_plot(dataframe = surplus, 
+                                         type_of_plot = "Region",
+                                         region_or_taxGroup = regions[i], 
+                                         SP_mean_biomass_data = region_surplus_mean_biomass[[i]],
+                                         stock = region_surplus_mean_biomass[[i]][k, 1], 
+                                         percent_surplus = region_surplus_mean_biomass[[i]][k, 4], 
+                                         plot_title = regions_plot_titles[i],
+                                         custom_colors = region_myColors,
+                                         color_legend_title = "Taxonomy Group",
+                                         color_segment = "taxGroup",
                                          print = FALSE,
                                          save = FALSE)
       print(plots_3)
@@ -610,24 +595,24 @@ for (i in 1:number_regions) {
   
   if (nrow(region_surplus_mean_biomass[[i]]) > 4) {  
     for (j in 1:4) {
-      plots_4 <- top_stocks_SP_vs_bio_plot(surplus,
-                                           region_surplus_mean_biomass[[i]][j, 1],
-                                           regions[i],
-                                           region_surplus_mean_biomass[[i]],
-                                           "Region",
-                                           regions_plot_titles[i],
+      plots_4 <- top_stocks_SP_vs_bio_plot(surplus_data = surplus,
+                                           stock = region_surplus_mean_biomass[[i]][j, 1],
+                                           regions_or_taxGroup = regions[i],
+                                           SP_mean_biomass_data = region_surplus_mean_biomass[[i]],
+                                           type_of_plot = "Region",
+                                           plot_titles = regions_plot_titles[i],
                                            print = FALSE,
                                            save = FALSE)
       print(plots_4)
     } 
   } else {
       for (k in 1:nrow(region_surplus_mean_biomass[[i]])) {
-        plots_4 <- top_stocks_SP_vs_bio_plot(surplus,
-                                             region_surplus_mean_biomass[[i]][k, 1],
-                                             regions[i],
-                                             region_surplus_mean_biomass[[i]],
-                                             "Region",
-                                             regions_plot_titles[i],
+        plots_4 <- top_stocks_SP_vs_bio_plot(surplus_data = surplus,
+                                             stock = region_surplus_mean_biomass[[i]][k, 1],
+                                             regions_or_taxGroup = regions[i],
+                                             SP_mean_biomass_data = region_surplus_mean_biomass[[i]],
+                                             type_of_plot = "Region",
+                                             plot_titles = regions_plot_titles[i],
                                              print = FALSE,
                                              save = FALSE)
         print(plots_4)
@@ -647,52 +632,54 @@ for (i in 1:number_TB_taxGroups) {
   pdf(file = paste(TB_taxGroup_list[i], "Summary Plots.pdf"), 
       width = 14, height = 8)
   
-  plot_1 <- biomass_all_stock_ggplot(TB_taxGroup_mean_biomass[[i]],
-                                     TB_taxGroup_custom_y_axis[[i]],
-                                     TB_taxGroup_plot_titles[i],
-                                     taxGroup_myColors,
-                                     "Taxonomy Group",
-                                     "region",
+  plot_1 <- biomass_all_stock_ggplot(dataframe = TB_taxGroup_mean_biomass[[i]],
+                                     y_axis = TB_taxGroup_custom_y_axis[[i]],
+                                     plot_title = TB_taxGroup_plot_titles[i],
+                                     custom_colors = taxGroup_myColors,
+                                     type_of_plot = "Taxonomy Group",
+                                     color_legend_title = "Region",
+                                     color_segment = "region",
                                      print = FALSE,
                                      save = FALSE)
   print(plot_1)
-  plot_2 <- biomass_plot_fun(TB_taxGroup_mean_biomass[[i]],
+  plot_2 <- biomass_plot_fun(dataframe = TB_taxGroup_mean_biomass[[i]],
                              end_stock = TB_stock_region_per_taxgroup$Num_Stocks[i],
-                             TB_taxGroup_plot_titles[i],
-                             "Taxonomy Group",
-                             taxGroup_myColors,
-                             "region",
+                             plot_title = TB_taxGroup_plot_titles[i],
+                             type_of_plot = "Taxonomy Group",
+                             custom_colors = taxGroup_myColors,
+                             color_legend_title = "Region",
+                             color_segment = "region",
                              print = FALSE,
                              save = FALSE)
   print(plot_2)
   if (nrow(TB_taxGroup_surplus_mean_biomass[[i]]) > 4) {
     for (j in 1:4) {
-      plots_3 <- surplus_top_stocks_plot(surplus, 
-                                         "Taxonomy Group",
-                                         TB_taxGroup_list[i], 
-                                         TB_taxGroup_surplus_mean_biomass[[i]],
-                                         TB_taxGroup_surplus_mean_biomass[[i]][j, 1], 
-                                         TB_taxGroup_surplus_mean_biomass[[i]][j, 4], 
-                                         TB_taxGroup_plot_titles[i],
-                                         taxGroup_myColors,
-                                         "Region",
-                                         "region",
+      plots_3 <- surplus_top_stocks_plot(dataframe = surplus, 
+                                         type_of_plot = "Taxonomy Group",
+                                         region_or_taxGroup = TB_taxGroup_list[i], 
+                                         SP_mean_biomass_data = TB_taxGroup_surplus_mean_biomass[[i]],
+                                         stock = TB_taxGroup_surplus_mean_biomass[[i]][j, 1], 
+                                         percent_surplus = TB_taxGroup_surplus_mean_biomass[[i]][j, 4], 
+                                         plot_title = TB_taxGroup_plot_titles[i],
+                                         custom_colors = taxGroup_myColors,
+                                         color_legend_title = "Region",
+                                         color_segment = "region",
                                          print = FALSE,
                                          save = FALSE)
       print(plots_3)
     }
   } else {
     for (k in 1:nrow(TB_taxGroup_surplus_mean_biomass[[i]])) {
-      plots_3 <- surplus_top_stocks_plot(surplus, 
-                                         "Taxonomy Group",
-                                         TB_taxGroup_list[i], 
-                                         TB_taxGroup_surplus_mean_biomass[[i]],
-                                         TB_taxGroup_surplus_mean_biomass[[i]][k, 1], 
-                                         TB_taxGroup_surplus_mean_biomass[[i]][k, 4], 
-                                         TB_taxGroup_plot_titles[i],
-                                         taxGroup_myColors,
-                                         "Region",
-                                         "region",
+      plots_3 <- surplus_top_stocks_plot(dataframe = surplus, 
+                                         type_of_plot = "Taxonomy Group",
+                                         region_or_taxGroup = TB_taxGroup_list[i], 
+                                         SP_mean_biomass_data = TB_taxGroup_surplus_mean_biomass[[i]],
+                                         stock = TB_taxGroup_surplus_mean_biomass[[i]][k, 1], 
+                                         percent_surplus = TB_taxGroup_surplus_mean_biomass[[i]][k, 4], 
+                                         plot_title = TB_taxGroup_plot_titles[i],
+                                         custom_colors = taxGroup_myColors,
+                                         color_legend_title = "Region",
+                                         color_segment = "region",
                                          print = FALSE,
                                          save = FALSE)
       print(plots_3)
@@ -805,7 +792,7 @@ for (i in 1:number_taxGroups) {
 #                               region_myColors,
 #                               "Taxonomy Group",
 #                               "taxGroup")
-# 
+#  
 # biomass_plot_fun(region_mean_biomass[[9]],
 #                  end_stock = TB_stock_tax_per_region$Num_Stocks[9],
 #                  regions_plot_titles[9],
@@ -868,14 +855,14 @@ for (i in 1:number_taxGroups) {
 #--------------------------------------------------------------------------------
 # All plot functions for taxGroup data:
 #------------------------------------------------------------------------------
-# basic_biomass_by_stock_ggplot(TB_taxGroup_mean_biomass[[2]], 
-#                               first_stock = 1, 
-#                               end_stock = TB_stock_region_per_taxgroup$Num_Stocks[2], 
-#                               taxGroup_plot_titles[2], 
-#                               "Taxonomy Group", 
-#                               taxGroup_myColors,
-#                               "Region",
-#                               "region")
+basic_biomass_by_stock_ggplot(TB_taxGroup_mean_biomass[[2]],
+                              first_stock = 1,
+                              end_stock = TB_stock_region_per_taxgroup$Num_Stocks[2],
+                              taxGroup_plot_titles[2],
+                              "Taxonomy Group",
+                              taxGroup_myColors,
+                              "Region",
+                              "region")
 # 
 # biomass_plot_fun(TB_taxGroup_mean_biomass[[7]],
 #                  end_stock = TB_stock_region_per_taxgroup$Num_Stocks[7],
