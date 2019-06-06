@@ -1,3 +1,7 @@
+### RAM Legacy Stock Assessment Database - Plot Creation Functions ##########
+## Created by Kelly Mistry, kelly.r.mistry@gmail.com
+## Last revised: 5/31/2019
+
 library(scales)
 
 #-----------------------------------------------------------------------------------
@@ -18,18 +22,27 @@ library(scales)
 #           start to end year of the data for that stock, ordered from highest
 #           to lowest average biomass for each stock
 
-basic_biomass_by_stock_ggplot <- function(dataframe, 
+basic_biomass_by_stock_ggplot <- function(region_or_taxGroup, 
                                           first_stock, 
                                           end_stock, 
-                                          plot_title,
                                           type_of_plot = c("Region", 
-                                                           "Taxonomy Group"),
-                                          custom_colors,
-                                          color_legend_title = c("Taxonomy Group",
-                                                           "Region"),
-                                          color_segment = c("taxGroup",
-                                                            "region")) {
-  ggplot(data = dataframe[first_stock:end_stock, ]) +
+                                                           "Taxonomy Group")) {
+  if (type_of_plot == "Region") {
+    color_legend_title <- "Taxonomy Group"
+    color_segment <- "taxGroup"
+    custom_colors <- region_myColors
+    dataframe <- region_mean_biomass[region_or_taxGroup]
+  } else {
+    color_legend_title <- "Region"
+    color_segment <- "region"
+    custom_colors <- taxGroup_myColors
+    dataframe <- TB_taxGroup_mean_biomass[region_or_taxGroup]
+  }
+  
+  plot_title <- region_or_taxGroup
+  data <- dataframe[[1]][first_stock:end_stock, ]
+  
+  ggplot(data = data) +
     geom_segment(aes(
       x = as.factor(jittered_mean),
       xend = as.factor(jittered_mean),
@@ -41,7 +54,7 @@ basic_biomass_by_stock_ggplot <- function(dataframe,
     size = 5) +
     scale_color_manual(name = color_legend_title, values = custom_colors) +
     geom_text(
-      data = dataframe[first_stock:end_stock, ],
+      data = data,
       aes(
         x = as.factor(jittered_mean),
         y = first_year,
@@ -53,7 +66,7 @@ basic_biomass_by_stock_ggplot <- function(dataframe,
     ) +
     scale_y_continuous(limits = c(1950, 2020), breaks = seq(1950, 2020, 10), 
                        labels = seq(1950, 2020, 10)) +
-    scale_x_discrete(labels = rev(comma(dataframe$mean_bio[first_stock:end_stock]))) +
+    scale_x_discrete(labels = rev(comma(dataframe[[1]]$mean_bio[first_stock:end_stock]))) +
     coord_flip() +
     theme_light() +
     theme(legend.position = "none",  
@@ -63,7 +76,7 @@ basic_biomass_by_stock_ggplot <- function(dataframe,
          y = "") +
     theme(plot.title = element_text(hjust = 0.5)) +
     scale_fill_discrete(guide = guide_legend()) +
-    theme(legend.position="bottom") +
+    theme(legend.position = "bottom") +
     theme(plot.margin = unit(c(1.5, 1.5, 1, 1.5), "cm"))
 }
 
@@ -78,27 +91,28 @@ basic_biomass_by_stock_ggplot <- function(dataframe,
 # of print (either TRUE or FALSE) and save (either TRUE or FALSE), and not
 # including first_stock
 
-biomass_plot_fun <- function(dataframe, 
-                             end_stock, 
-                             plot_title,
+biomass_plot_fun <- function(region_or_taxGroup, 
+                             num_stocks_df,
                              type_of_plot = c("Region", 
                                               "Taxonomy Group"),
-                             custom_colors,
-                             color_legend_title = c("Taxonomy Group",
-                                                    "Region"),
-                             color_segment = c("taxGroup",
-                                               "region"),
                              print = TRUE,
                              save = FALSE) {
+  
+  end_stock <- num_stocks_df[rownames(num_stocks_df) == region_or_taxGroup, 1]
+  # If any region or taxGroup has more than 90 stocks, stop execution and return the following 
+  # error message:
+  if (end_stock > 90) {
+    stop(paste(region_or_taxGroup, "has more than 90 stocks; biomass_plot_fun will need to be
+               modified to accommodate a 4th plot"))
+  }
+  
+  plot_title <- region_or_taxGroup
+  
   if (end_stock <= 30) {
-    plot_x1 <- basic_biomass_by_stock_ggplot(dataframe, 
+    plot_x1 <- basic_biomass_by_stock_ggplot(region_or_taxGroup = region_or_taxGroup, 
                                              first_stock = 1, 
-                                             end_stock,
-                                             plot_title,
-                                             type_of_plot,
-                                             custom_colors,
-                                             color_legend_title,
-                                             color_segment)
+                                             end_stock = end_stock,
+                                             type_of_plot = type_of_plot)
     plot_x1 <- plot_x1 +
       labs(subtitle = "Stocks ordered from lowest to highest average biomass") +
       theme(plot.subtitle = element_text(hjust = 0.5))
@@ -114,26 +128,18 @@ biomass_plot_fun <- function(dataframe,
       return(plot_x1)
     }
   } else if (end_stock > 30 & end_stock <= 60) {
-    plot_x1 <- basic_biomass_by_stock_ggplot(dataframe, 
+    plot_x1 <- basic_biomass_by_stock_ggplot(region_or_taxGroup = region_or_taxGroup, 
                                              first_stock = 1, 
                                              end_stock = round(end_stock/2),
-                                             plot_title,
-                                             type_of_plot,
-                                             custom_colors,
-                                             color_legend_title,
-                                             color_segment)
+                                             type_of_plot = type_of_plot)
     plot_x1 <- plot_x1 +
       labs(subtitle = "Stocks with highest average biomass") +
       theme(plot.subtitle = element_text(hjust = 0.5))
     
-    plot_x2 <- basic_biomass_by_stock_ggplot(dataframe, 
+    plot_x2 <- basic_biomass_by_stock_ggplot(region_or_taxGroup = region_or_taxGroup, 
                                              first_stock = round(end_stock/2) + 1, 
                                              end_stock = end_stock,
-                                             plot_title,
-                                             type_of_plot,
-                                             custom_colors,
-                                             color_legend_title,
-                                             color_segment)
+                                             type_of_plot = type_of_plot)
     plot_x2 <- plot_x2 + 
       labs(subtitle = "Stocks with lowest average biomass") +
       theme(plot.subtitle = element_text(hjust = 0.5))
@@ -152,38 +158,26 @@ biomass_plot_fun <- function(dataframe,
       return(list(plot_x1, plot_x2))
     }
   } else {
-    plot_x1 <- basic_biomass_by_stock_ggplot(dataframe, 
+    plot_x1 <- basic_biomass_by_stock_ggplot(region_or_taxGroup = region_or_taxGroup, 
                                              first_stock = 1, 
                                              end_stock = round(end_stock/3),
-                                             plot_title,
-                                             type_of_plot,
-                                             custom_colors,
-                                             color_legend_title,
-                                             color_segment)
+                                             type_of_plot = type_of_plot)
     plot_x1 <- plot_x1 +
       labs(subtitle = "1/3 of Stocks with highest average biomass") +
       theme(plot.subtitle = element_text(hjust = 0.5))
     
-    plot_x2 <- basic_biomass_by_stock_ggplot(dataframe, 
+    plot_x2 <- basic_biomass_by_stock_ggplot(region_or_taxGroup = region_or_taxGroup, 
                                              first_stock = round(end_stock/3) + 1, 
                                              end_stock = round(end_stock*(2/3)),
-                                             plot_title,
-                                             type_of_plot,
-                                             custom_colors,
-                                             color_legend_title,
-                                             color_segment)
+                                             type_of_plot = type_of_plot)
     plot_x2 <- plot_x2 +
       labs(subtitle = "1/3 of Stocks with medium average biomass") +
       theme(plot.subtitle = element_text(hjust = 0.5))
     
-    plot_x3 <- basic_biomass_by_stock_ggplot(dataframe, 
+    plot_x3 <- basic_biomass_by_stock_ggplot(region_or_taxGroup = region_or_taxGroup, 
                                              first_stock = round(end_stock*(2/3)) + 1, 
                                              end_stock = end_stock,
-                                             plot_title,
-                                             type_of_plot,
-                                             custom_colors,
-                                             color_legend_title,
-                                             color_segment)
+                                             type_of_plot = type_of_plot)
     plot_x3 <- plot_x3 +
       labs(subtitle = "1/3 of Stocks with lowest average biomass") +
       theme(plot.subtitle = element_text(hjust = 0.5))
@@ -218,18 +212,26 @@ biomass_plot_fun <- function(dataframe,
 #--- plot_title is either region_plot_titles or TB_taxGroup_plot_titles
 #--- custom_colors is either region_myColors or taxGroup_myColors
 
-biomass_all_stock_ggplot <- function(dataframe, 
-                                     y_axis, 
-                                     plot_title,
-                                     custom_colors,
+biomass_all_stock_ggplot <- function(region_or_taxGroup, 
                                      type_of_plot = c("Region", 
                                                       "Taxonomy Group"),
-                                     color_legend_title = c("Taxonomy Group",
-                                                            "Region"),
-                                     color_segment = c("taxGroup",  
-                                                       "region"),
                                      print = TRUE,
                                      save = FALSE) { #max_mean_biomass only required if creating custom y-axis
+  if (type_of_plot == "Region") {
+    color_legend_title <- "Taxonomy Group"
+    color_segment <- "taxGroup"
+    custom_colors <- region_myColors
+    dataframe <- region_mean_biomass[region_or_taxGroup][[1]]
+    y_axis <- region_custom_y_axis[region_or_taxGroup][[1]]
+  } else {
+    color_legend_title <- "Region"
+    color_segment <- "region"
+    custom_colors <- taxGroup_myColors
+    dataframe <- TB_taxGroup_mean_biomass[region_or_taxGroup][[1]]
+    y_axis <- TB_taxGroup_custom_y_axis[region_or_taxGroup][[1]]
+  }
+  plot_title <- region_or_taxGroup
+  
   plot_all <- ggplot(data = dataframe) +
     geom_segment(aes(
       x = log10(jittered_mean),
@@ -257,7 +259,7 @@ biomass_all_stock_ggplot <- function(dataframe,
          y = "") +
     theme(plot.title = element_text(hjust = 0.5)) +
     scale_fill_discrete(guide = guide_legend()) +
-    theme(legend.position="right") +
+    theme(legend.position = "right") +
     theme(plot.margin = unit(c(1.5, 1.5, 1, 1.5), "cm"))
   
   if (print == TRUE) {
@@ -284,30 +286,30 @@ biomass_all_stock_ggplot <- function(dataframe,
 surplus_top_stocks_plot <- function(dataframe, 
                                     type_of_plot = c("Region", 
                                                      "Taxonomy Group"),
-                                    region_or_taxGroup, 
                                     SP_mean_biomass_data, 
-                                    stock,
-                                    percent_surplus,
-                                    plot_title,
-                                    custom_colors,
-                                    color_legend_title = c("Taxonomy Group",
-                                                           "Region"),
-                                    color_segment = c("taxGroup", 
-                                                      "region"),
+                                    stock_row,
                                     print = TRUE,
                                     save = FALSE) {
-  if (type_of_plot == "Region") {
-    surplus_top_stocks_data <- subset(dataframe, is.na(dataframe$SP) == FALSE & 
-                                        dataframe$year >= year_min & 
-                                        dataframe$region == region_or_taxGroup)
-  } else {
-    surplus_top_stocks_data <- subset(dataframe, is.na(dataframe$SP) == FALSE & 
-                                        dataframe$year >= year_min & 
-                                        dataframe$taxGroup == region_or_taxGroup)
-  }
+  stock <- SP_mean_biomass_data[stock_row, 1]
+  percent_surplus <- SP_mean_biomass_data[stock_row, 4]
   stock_number <- which(SP_mean_biomass_data[, 1] == stock)
   
-  surplus_top_stocks <- ggplot(data = surplus_top_stocks_data[surplus_top_stocks_data$stocklong == stock, ]) +
+  surplus_top_stocks_data <- dataframe[dataframe$stocklong == stock & 
+                                         dataframe$year >= 1950, ]
+  
+  if (type_of_plot == "Region") {
+    color_legend_title = "Taxonomy Group"
+    color_segment = "taxGroup"
+    custom_colors = region_myColors
+    plot_title = unique(dataframe$region)
+  } else {
+    color_legend_title = "Region"
+    color_segment = "region"
+    custom_colors = taxGroup_myColors
+    plot_title = unique(dataframe$taxGroup)
+  }
+  
+  surplus_top_stocks <- ggplot(data = surplus_top_stocks_data) +
     geom_col(aes(x = year, y = SP, fill = get(color_segment))) +
     scale_fill_manual(name = color_legend_title, values = custom_colors) +
     scale_x_continuous(limits = c(1950, 2020), breaks = seq(1950, 2020, 10), 
@@ -333,7 +335,7 @@ surplus_top_stocks_plot <- function(dataframe,
   if (save == TRUE) {
     ggsave(surplus_top_stocks,
            filename = paste("Surplus_Production_- Stock", stock_number, 
-                                               region_or_taxGroup, ".png",sep="_"),
+                            plot_title, ".png",sep="_"),
            device = "png", width = 11, height = 8, units = "in")
   }
   if (print == FALSE & save == FALSE) {
@@ -352,12 +354,12 @@ top_stocks_SP_vs_bio_plot <- function(surplus_data,
                                       SP_mean_biomass_data,
                                       type_of_plot = c("Region",
                                                        "Taxonomy Group"),
-                                      plot_titles,
                                       print = TRUE,
                                       save = FALSE) {
   plot_data <- surplus_data[surplus_data$stocklong == stock & 
                               surplus_data$year >= year_min, ]
   stock_number <- which(SP_mean_biomass_data[, 1] == stock)
+  plot_title <- regions_or_taxGroup
   
   SP_v_Bio_plot <- ggplot(data = plot_data, aes(x = B, y = SP)) +
     geom_point(aes(color = year)) +
@@ -368,7 +370,7 @@ top_stocks_SP_vs_bio_plot <- function(surplus_data,
     scale_color_gradient(low = "blue", high = "red") +
     scale_y_continuous(labels = comma) +
     scale_x_continuous(labels = comma) +
-    labs(title = paste(stock, "\nin", plot_titles, type_of_plot, sep = " "),
+    labs(title = paste(stock, "\nin", plot_title, type_of_plot, sep = " "),
          x = "Biomass (MT)",
          y = "Surplus Production (MT)",
          color = "Year",

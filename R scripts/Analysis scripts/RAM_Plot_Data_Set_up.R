@@ -1,5 +1,5 @@
 ## Created by Kelly Mistry, kelly.r.mistry@gmail.com
-## Last revised: 4/3/2019
+## Last revised: 5/31/2019
 
 # This script is designed to be run as part of
 # Region_or_taxGroup_Plots_Code-KM.R and it produces the transformed and
@@ -106,41 +106,48 @@ stock_count_years <- seq(year_min, year_max, by = 5)
 stock_ids <- unique(timeseries_values_views$stockid)
 number_stocks <- length(stock_ids)
 
+# Separate out timeseries_values_views and All_TBbest.df data into lists of 
+# dataframes, one list separated by regions (excluding the salmon regions), the 
+# other by taxGroup 
+seg_timeseries_values_views <- timeseries_values_views[timeseries_values_views$region %in% regions, ]
+timeseries_values_views_region_list <- split(seg_timeseries_values_views, 
+                                     seg_timeseries_values_views$region)
+timeseries_values_views_taxGroup_list <- split(timeseries_values_views,
+                                                   timeseries_values_views$taxGroup)
+
+seg_All_TBbest.df <- All_TBbest.df[All_TBbest.df$region %in% regions, ]
+All_TBbest.df_region_list <- split(seg_All_TBbest.df, seg_All_TBbest.df$region)
+All_TBbest.df_taxGroup_list <- split(All_TBbest.df, All_TBbest.df$taxGroup)
+
 ################################################################################
 ########################### Summary Dataframes  ################################
 ################################################################################
 
 # Number of stocks, taxonomy groups and first & last year with data in each 
 # region, used to produce summary tables at top of region pages:
-stock_tax_per_region <- summary_fun("Region", 
-                                    timeseries_values_views, 
-                                    regions, 
-                                    number_regions, 
-                                    regions_plot_titles)
-
+stock_tax_per_region <- summary_fun(type_of_plot = "region", 
+                                    input_data = timeseries_values_views_region_list, 
+                                    number_taxGroup_or_region = number_regions, 
+                                    row_names = regions_plot_titles)
 
 # Number of stocks, regions and first & last year with data in each taxonomy 
 # group, used to produce summary tables at top of taxonomy group pages:
-stock_region_per_taxgroup <- summary_fun("taxGroup", 
-                                         timeseries_values_views, 
-                                         taxGroup_list, 
-                                         number_taxGroups, 
-                                         taxGroup_labels)
-
+stock_region_per_taxgroup <- summary_fun(type_of_plot = "taxGroup", 
+                                         input_data = timeseries_values_views_taxGroup_list, 
+                                         number_taxGroup_or_region = number_taxGroups, 
+                                         row_names = taxGroup_labels)
 
 # Version of the above with the All_TBbest.df; this will tell what to expect 
 # in the biomass coverage plots
-TB_stock_tax_per_region <- summary_fun("Region", 
-                                      All_TBbest.df, 
-                                      regions, 
-                                      number_regions, 
-                                      regions_plot_titles)
+TB_stock_tax_per_region <- summary_fun(type_of_plot = "region", 
+                                         input_data = All_TBbest.df_region_list, 
+                                         number_taxGroup_or_region = number_regions, 
+                                         row_names = regions_plot_titles)
 
-TB_stock_region_per_taxgroup <- summary_fun("taxGroup", 
-                                            All_TBbest.df, 
-                                            TB_taxGroup_list, 
-                                            number_TB_taxGroups, 
-                                            TB_taxGroup_plot_titles)
+TB_stock_region_per_taxgroup <- summary_fun(type_of_plot = "taxGroup", 
+                                            input_data = All_TBbest.df_taxGroup_list, 
+                                            number_taxGroup_or_region = number_TB_taxGroups, 
+                                            row_names = TB_taxGroup_plot_titles)
 
 
 ################################################################################
@@ -177,11 +184,11 @@ names(taxGroup_myColors) <- regions
 # Calculate average biomass over the time series for each stock in each region and 
 # extract the first and last years that each stock appears in the assessment 
 region_mean_biomass <- mean_biomass_fun("Region",
-                         region_labels,
-                         number_regions,
-                         All_TBbest.df,
-                         regions,
-                         year_min)
+                                        regions,
+                                        number_regions,
+                                        All_TBbest.df_region_list,
+                                        #regions,
+                                        year_min)
 
 # Order factor levels for taxGroup so they will appear in a specific order in
 # the color legend of the region plots:
@@ -190,13 +197,12 @@ for (i in 1:number_regions) {
                                        levels = region_legend_order)
 }
 
-
 TB_taxGroup_mean_biomass <- mean_biomass_fun("taxGroup",
-                         TB_taxGroup_labels,
-                         number_TB_taxGroups,
-                         All_TBbest.df,
-                         TB_taxGroup_list,
-                         year_min)
+                                             TB_taxGroup_list,
+                                             number_TB_taxGroups,
+                                             All_TBbest.df_taxGroup_list,
+                                             #TB_taxGroup_list,
+                                             year_min)
 
 
 ################################################################################
@@ -205,13 +211,13 @@ TB_taxGroup_mean_biomass <- mean_biomass_fun("taxGroup",
 
 # Create y axis labels for biomass coverage for all stocks by region plots:
 region_custom_y_axis <- custom_y_axis_fun(number_regions, 
-                  region_labels,
-                  region_mean_biomass)
+                                          region_or_taxGroup = regions,
+                                          region_mean_biomass)
 
 # Create y axis labels for biomass coverage for all stocks by taxGroup plots:
 TB_taxGroup_custom_y_axis <- custom_y_axis_fun(number_TB_taxGroups, 
-                                          TB_taxGroup_labels,
-                                          TB_taxGroup_mean_biomass)
+                                               region_or_taxGroup = TB_taxGroup_list,
+                                               TB_taxGroup_mean_biomass)
 
 
 ###############################################################################
@@ -220,6 +226,8 @@ TB_taxGroup_custom_y_axis <- custom_y_axis_fun(number_TB_taxGroups,
 #
 # For RAM v4.44 data:
 surplus <- read.csv(here::here("Data/RAM Files (v4.44)/surplus production/sp.data.csv")) # the surplus production with model fit data
+NA_ind <- unique(c(which(is.na(surplus$B)), which(is.na(surplus$SP))))
+surplus <- surplus[-NA_ind, ]
 
 # Importing stocklong, region, scientificname, taxGroup from other dataframes
 surplus$stocklong <- 
@@ -246,24 +254,21 @@ surplus$MSYbest <-
   bioparams_values_views$MSYbest[match(surplus$stockid, 
                                        bioparams_values_views$stockid)]
 
+# Creating lists of with surplus data split by region and by taxGroup:
+surplus_region_list <- split(surplus, surplus$region)
+surplus_taxGroup_list <- split(surplus, surplus$taxGroup)
 
 ###############################################################################
 ############# Dataframes for Surplus Production Plots #########################
 ###############################################################################
 
 # Average surplus production and biomass for each stock in each region:
-region_surplus_mean_biomass <- mean_SP_fun(surplus,
-                                           "Region",
-                                           regions,
+region_surplus_mean_biomass <- mean_SP_fun(surplus_region_list,
                                            region_labels,
                                            number_regions)
 
-
 # Average surplus production and biomass for each stock in each taxGroup:
-TB_taxGroup_surplus_mean_biomass <- mean_SP_fun(surplus,
-                                                "Taxonomy Group",
-                                                TB_taxGroup_list,
+TB_taxGroup_surplus_mean_biomass <- mean_SP_fun(surplus_taxGroup_list,
                                                 TB_taxGroup_labels,
                                                 number_TB_taxGroups)
-
 
