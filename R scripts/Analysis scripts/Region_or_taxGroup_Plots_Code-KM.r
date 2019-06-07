@@ -418,7 +418,6 @@ for (j in 1:number_regions) {
                                 regions_or_taxGroup = regions[j],
                                 SP_mean_biomass_data = region_surplus_mean_biomass[[j]],
                                 type_of_plot = "Region",
-                                plot_titles = regions_plot_titles[j],
                                 print = FALSE,
                                 save = TRUE)
     }
@@ -429,7 +428,6 @@ for (j in 1:number_regions) {
                                 regions_or_taxGroup = regions[j],
                                 SP_mean_biomass_data = region_surplus_mean_biomass[[j]],
                                 type_of_plot = "Region",
-                                plot_titles = regions_plot_titles[j],
                                 print = FALSE,
                                 save = TRUE)
     }
@@ -450,7 +448,6 @@ for (j in 1:number_TB_taxGroups) {
                                 regions_or_taxGroup = TB_taxGroup_list[j],
                                 SP_mean_biomass_data = TB_taxGroup_surplus_mean_biomass[[j]],
                                 type_of_plot = "Taxonomy Group",
-                                plot_titles = TB_taxGroup_plot_titles[j],
                                 print = FALSE,
                                 save = TRUE)
     }
@@ -461,7 +458,6 @@ for (j in 1:number_TB_taxGroups) {
                                 regions_or_taxGroup = TB_taxGroup_list[j],
                                 SP_mean_biomass_data = TB_taxGroup_surplus_mean_biomass[[j]],
                                 type_of_plot = "Taxonomy Group",
-                                plot_titles = TB_taxGroup_plot_titles[j],
                                 print = FALSE,
                                 save = TRUE)
     }
