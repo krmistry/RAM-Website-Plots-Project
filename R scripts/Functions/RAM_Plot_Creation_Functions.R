@@ -383,7 +383,7 @@ top_stocks_SP_vs_bio_plot <- function(surplus_data,
   }
   if (save == TRUE) {
     ggsave(SP_v_Bio_plot,
-           filename = paste("Production_v_Biomass-Stock", stock_number, plot_titles, 
+           filename = paste("Production_v_Biomass-Stock", stock_number, regions_or_taxGroup, 
                             ".png",sep="_"), 
            device = "png", width = 11, height = 8, units = "in")
   }
