@@ -418,7 +418,6 @@ for (j in 1:number_regions) {
                                 regions_or_taxGroup = regions[j],
                                 SP_mean_biomass_data = region_surplus_mean_biomass[[j]],
                                 type_of_plot = "Region",
-                                plot_titles = regions_plot_titles[j],
                                 print = FALSE,
                                 save = TRUE)
     }
@@ -429,7 +428,6 @@ for (j in 1:number_regions) {
                                 regions_or_taxGroup = regions[j],
                                 SP_mean_biomass_data = region_surplus_mean_biomass[[j]],
                                 type_of_plot = "Region",
-                                plot_titles = regions_plot_titles[j],
                                 print = FALSE,
                                 save = TRUE)
     }
@@ -450,7 +448,6 @@ for (j in 1:number_TB_taxGroups) {
                                 regions_or_taxGroup = TB_taxGroup_list[j],
                                 SP_mean_biomass_data = TB_taxGroup_surplus_mean_biomass[[j]],
                                 type_of_plot = "Taxonomy Group",
-                                plot_titles = TB_taxGroup_plot_titles[j],
                                 print = FALSE,
                                 save = TRUE)
     }
@@ -461,7 +458,6 @@ for (j in 1:number_TB_taxGroups) {
                                 regions_or_taxGroup = TB_taxGroup_list[j],
                                 SP_mean_biomass_data = TB_taxGroup_surplus_mean_biomass[[j]],
                                 type_of_plot = "Taxonomy Group",
-                                plot_titles = TB_taxGroup_plot_titles[j],
                                 print = FALSE,
                                 save = TRUE)
     }
@@ -687,48 +683,48 @@ for (i in 1:number_taxGroups) {
 #--------------------------------------------------------------------------------
 # All plot functions for region data:
 #------------------------------------------------------------------------------
-basic_biomass_by_stock_ggplot(region_or_taxGroup = sort(regions)[20],
-                              first_stock = 1,
-                              end_stock = TB_stock_tax_per_region$Num_Stocks[20],
-                              type_of_plot = "Region")
-
-biomass_plot_fun(region_or_taxGroup = regions[20],
-                 num_stocks_df = TB_stock_tax_per_region,
-                 type_of_plot = "Region")
-
-
-biomass_all_stock_ggplot(region_or_taxGroup = regions[7],
-                         type_of_plot = "Region")
+# basic_biomass_by_stock_ggplot(region_or_taxGroup = sort(regions)[20],
+#                               first_stock = 1,
+#                               end_stock = TB_stock_tax_per_region$Num_Stocks[20],
+#                               type_of_plot = "Region")
+# 
+# biomass_plot_fun(region_or_taxGroup = regions[20],
+#                  num_stocks_df = TB_stock_tax_per_region,
+#                  type_of_plot = "Region")
+# 
+# 
+# biomass_all_stock_ggplot(region_or_taxGroup = regions[7],
+#                          type_of_plot = "Region")
 
 # Single stock surplus plot:
-surplus_top_stocks_plot(dataframe = surplus_region_list[[9]],
-                        type_of_plot = "Region",
-                        SP_mean_biomass_data = region_surplus_mean_biomass[[9]],
-                        stock_row = 1)
-
-# All 4 stock surplus plots for 1 region:
-for (i in 1:4) {
-  plot <- surplus_top_stocks_plot(dataframe = surplus_region_list[[9]],
-                                  type_of_plot = "Region",
-                                  SP_mean_biomass_data = region_surplus_mean_biomass[[9]],
-                                  stock_row = i)
-}
+# surplus_top_stocks_plot(dataframe = surplus_region_list[[9]],
+#                         type_of_plot = "Region",
+#                         SP_mean_biomass_data = region_surplus_mean_biomass[[9]],
+#                         stock_row = 1)
+# 
+# # All 4 stock surplus plots for 1 region:
+# for (i in 1:4) {
+#   plot <- surplus_top_stocks_plot(dataframe = surplus_region_list[[9]],
+#                                   type_of_plot = "Region",
+#                                   SP_mean_biomass_data = region_surplus_mean_biomass[[9]],
+#                                   stock_row = i)
+# }
 
 # Single stock surplus v. biomass plot:
-top_stocks_SP_vs_bio_plot(surplus_data = surplus,
-                          stock = region_surplus_mean_biomass[[2]][4, 1],
-                          regions_or_taxGroup = sort(regions)[2],
-                          SP_mean_biomass_data = region_surplus_mean_biomass[[2]],
-                          type_of_plot = "Region")
-
+# top_stocks_SP_vs_bio_plot(surplus_data = surplus,
+#                           stock = region_surplus_mean_biomass[[2]][4, 1],
+#                           regions_or_taxGroup = sort(regions)[2],
+#                           SP_mean_biomass_data = region_surplus_mean_biomass[[2]],
+#                           type_of_plot = "Region")
+# 
 # All 4 stock surplus v. biomass plots for 1 region:
-for (i in 1:4) {
-  top_stocks_SP_vs_bio_plot(surplus_data = surplus,
-                            stock = region_surplus_mean_biomass[[2]][i, 1],
-                            regions_or_taxGroup = sort(regions)[2],
-                            SP_mean_biomass_data = region_surplus_mean_biomass[[2]],
-                            type_of_plot = "Region")
-}
+# for (i in 1:4) {
+#   top_stocks_SP_vs_bio_plot(surplus_data = surplus,
+#                             stock = region_surplus_mean_biomass[[2]][i, 1],
+#                             regions_or_taxGroup = sort(regions)[2],
+#                             SP_mean_biomass_data = region_surplus_mean_biomass[[2]],
+#                             type_of_plot = "Region")
+# }
 
 #--------------------------------------------------------------------------------
 # All plot functions for taxGroup data:
