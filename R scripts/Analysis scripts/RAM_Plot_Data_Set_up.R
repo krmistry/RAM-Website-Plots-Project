@@ -67,7 +67,13 @@ All_TBbest.df <- subset(timeseries_values_views,
 
 ##################################################################################
 ######### Parameters for All Data Transformations & Segmentations ################
-##################################################################################
+#################################################################################
+
+# if there are NAs in either region or taxGroup, stop operation
+if (any(is.na(timeseries_values_views$region) == TRUE) | 
+    any(is.na(timeseries_values_views$taxGroup) == TRUE)) { 
+  stop(paste("timeseries_values_views has NAs in region and/or taxGroup column"))
+}
 
 # Region lists:
 regions <- unique(timeseries_values_views$region)
