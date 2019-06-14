@@ -38,6 +38,11 @@ stock_info <- read.csv(here::here("Data/RAM Files (v4.44)/ram tables/stock.csv")
 # File that contains taxGroup (and FisheryType) mapped to scientificname:
 taxonomy <- read.csv(here::here("Data/RAM Files (v4.44)/ram tables/taxonomy.csv"))
 
+# On windows computers, the first column names in the imported dataframes stock.csv 
+# and taxonomy.csv had extra characters added, so correcting for that:
+colnames(stock_info)[1] <- "stockid"
+colnames(taxonomy)[1] <- "tsn"
+
 # Adding region, scientificname, FisheryType and taxGroup variables to 
 # timeseries_values_views dataframe:
 timeseries_values_views$region <-
